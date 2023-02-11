@@ -108,8 +108,6 @@ def add_coordinates(image_metadata):
     return image_metadata
 
 
-# image_metadata[0:2].to_json(
-#     "./data/preprocessed/stream/image_data_metadata.json", orient="records", default_handler=str)
 if __name__ == "__main__":
 
     # Prepare data
@@ -129,4 +127,10 @@ if __name__ == "__main__":
     image_metadata = image_metadata.loc[:, json_columns]
 
     image_metadata.to_csv(
-        "./data/preprocessed/images/images_metadata.csv",  index=False)
+        "./preprocessing/data/preprocessed/images/images_metadata.csv",
+        index=False)
+
+    image_metadata[0:2].to_json(
+        "./preprocessing/data/preprocessed/stream/image_data_metadata.json",
+        orient="records",
+        default_handler=str)

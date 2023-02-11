@@ -1,6 +1,7 @@
 from pathlib import Path
 import itertools
 import pandas as pd
+import json
 
 # load and shuffle data
 twitter_data_filepath = "./preprocessing/data/original/hurricane_harvey.csv"
@@ -85,14 +86,14 @@ def assign_id_columns(tweets_df, group_size, df):
                     'YearMonthDay', 'Likes', 'Tweet', 'Retweets']
 
     tweets_df = tweets_df[column_names]
-    tweets_df = tweets_df.rename(columns=
-                                {'Replies': 'replies', 'Likes': 'likes', 
-                                'Tweet': 'tweet', 'Retweets': 'retweets', 
-                                'Time': 'time', 'YearMonthDay': 'year_month_day'
-                                }
-                                )
+    tweets_df = tweets_df.rename(columns={'Replies': 'replies', 'Likes': 'likes',
+                                          'Tweet': 'tweet', 'Retweets': 'retweets',
+                                 'Time': 'time', 'YearMonthDay': 'year_month_day'
+                                          }
+                                 )
     print("returning tweets_df, columns:", tweets_df.columns)
-    tweets_df.to_csv("./preprocessing/data/preprocessed/tweets_df.csv", index=False)
+    tweets_df.to_csv(
+        "./preprocessing/data/preprocessed/tweets_df.csv", index=False)
     return tweets_df
 
 
@@ -134,15 +135,10 @@ def split_to_batch_and_streaming_data(tweets_df):
 
 
 if __name__ == "__main__":
-
     tweets_df = read_preprocess_twitter_data(twitter_data_filepath)
-
     flattened_ids = create_artificial_ids(group_size=100, df=tweets_df)
-
     tweets_df = assign_id_columns(tweets_df, group_size=100, df=tweets_df)
-
     tweets_stream = split_to_batch_and_streaming_data(tweets_df)
-
     tweets_stream.to_json(
         "./preprocessing/data/preprocessed/stream/tweets_stream.json", orient="records")
     print("steaming data saved to json -- again!?")

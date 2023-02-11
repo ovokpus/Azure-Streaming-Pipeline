@@ -1,4 +1,4 @@
-pandas==1.2.2
+pandas==1.5.3
 requests==2.25.1
 python-dotenv==0.15.0
 fire==0.4
