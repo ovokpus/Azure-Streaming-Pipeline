@@ -15,10 +15,9 @@ URL = f"{HURRICANE_API_URL}"
 # URL = "http://localhost:7071/api/HttpTrigger1"
 
 headers = {
-    'Host': 'noreur-dev-dataeng-apim.azure-api.net',
+    'Host': 'tweet-stream-apim.azure-api.net',
     'Authorization': AUTH_VALUE,
-    'Ocp-Apim-Subscription-Key': OCP_APIM_SUBSCRIPTION_VALUE,
-    'Ocp-Apim-Trace': 'true'
+    'Ocp-Apim-Subscription-Key': OCP_APIM_SUBSCRIPTION_VALUE
 }
 
 
@@ -29,7 +28,7 @@ def send_tweets_to_rest_api(num_tweets):
         number_of_tweet_messages ([type]): [description]
     """
     tweets_stream_sample = pd.read_json(
-        "./data/preprocessed/merged/merged_tweets_image_metadata_stream.json",
+        "./preprocessing/data/preprocessed/merged/merged_tweets_image_metadata_stream.json",
         orient="records")
 
     if num_tweets < 1000:  # tweets_stream_sample.shape[0]:
@@ -52,6 +51,7 @@ def send_tweets_to_rest_api(num_tweets):
             else:
                 print(
                     f"Request number {i} NOT succeded! Status code {request.status_code}")
+                print(request.content)
     else:
         print(
             f"Maximum number of tweets is {tweets_stream_sample.shape[0]}, and you have chosen: {num_tweets}. Please choose a smaller number!")

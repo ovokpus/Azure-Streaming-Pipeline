@@ -23,8 +23,8 @@ if __name__ == "__main__":
 
     merged_tweets_image_metadata.columns
 
-    new_column_names = ['tweet_id', 'account_id', 'likes', 'replies', 'retweets', 'tweet',
-                        'time', 'year_month_day', 'damage_flag', 'image_base64', 'latitude',
+    new_column_names = ['tweet_id', 'account_id', 'likes', 'replies', 'year_month_day', 'retweets', 'tweet',
+                        'time', 'damage_flag', 'image_base64', 'latitude',
                         'longitude']
 
     merged_tweets_image_metadata.columns = new_column_names

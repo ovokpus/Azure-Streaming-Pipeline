@@ -40,18 +40,18 @@ tweet_schema = {
         "year_month_date": {
             "type": "string"
         },
-        "damage_flag": {
-            "type": "string"
-        },
-        "image_base64": {
-            "type": "string"
-        },
-        "latitude": {
-            "type": "number"
-        },
-        "longitude": {
-            "type": "number"
-        }
+        # "damage_flag": {
+        #     "type": "string"
+        # },
+        # "image_base64": {
+        #     "type": "string"
+        # },
+        # "latitude": {
+        #     "type": "number"
+        # },
+        # "longitude": {
+        #     "type": "number"
+        # }
     },
     "required": [
         "tweet_id",
@@ -62,7 +62,7 @@ tweet_schema = {
         "tweet",
         "time",
         "damage_flag",
-        "image_base64",
+        # "image_base64",
         "latitude",
         "longitude"
     ]
@@ -70,7 +70,7 @@ tweet_schema = {
 
 
 def main(req: func.HttpRequest,
-         #  outputBlob: func.Out[bytes],
+         outputBlob: func.Out[bytes],
          #  outputEventHubMessage: func.Out[bytes]
          ) -> func.HttpResponse:
 
@@ -84,8 +84,8 @@ def main(req: func.HttpRequest,
         validate(instance=json_loads_py, schema=tweet_schema)
         logging.info("JSON schema is valid!")
 
-        # outputBlob.set(json_data)
-        # logging.info('Tweet is written to blob storage.')
+        outputBlob.set(json_data)
+        logging.info('Tweet is written to blob storage.')
 
         # outputEventHubMessage.set(json_data)
         # logging.info('Tweet is forwarded to Event Hub.')
