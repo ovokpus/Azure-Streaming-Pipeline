@@ -1,0 +1,26 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "events",
+      "direction": "in",
+      "eventHubName": "tweet-stream-eh1",
+      "connection": "tweetstreameventhubsnamespace_RootManageSharedAccessKey_EVENTHUB",
+      "cardinality": "many",
+      "consumerGroup": "$Default",
+      "dataType": "binary"
+    },
+    {
+      "type": "cosmosDB",
+      "direction": "out",
+      "name": "outputDocument",
+      "databaseName": "hurricane",
+      "collectionName": "tweets",
+      "createIfNotExists": false,
+      "connectionStringSetting": "tweetstreamcosmosdb_DOCUMENTDB",
+      "partitionKey": "account_id",
+      "collectiionThroughput": "undefined"
+    }
+  ]
+}

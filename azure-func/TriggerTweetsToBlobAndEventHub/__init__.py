@@ -71,7 +71,7 @@ tweet_schema = {
 
 def main(req: func.HttpRequest,
          outputBlob: func.Out[bytes],
-         #  outputEventHubMessage: func.Out[bytes]
+         outputEventHubMessage: func.Out[bytes]
          ) -> func.HttpResponse:
 
     logging.info('Python HTTP trigger function processed a request.')
@@ -87,8 +87,8 @@ def main(req: func.HttpRequest,
         outputBlob.set(json_data)
         logging.info('Tweet is written to blob storage.')
 
-        # outputEventHubMessage.set(json_data)
-        # logging.info('Tweet is forwarded to Event Hub.')
+        outputEventHubMessage.set(json_data)
+        logging.info('Tweet is forwarded to Event Hub.')
 
         # logging.info('This HTTP triggered function executed successfully.')
 

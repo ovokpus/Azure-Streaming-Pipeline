@@ -22,6 +22,13 @@
       "name": "outputBlob",
       "path": "tweets/{rand-guid}.json",
       "connection": "functiontweets9532d1_STORAGE"
+    },
+    {
+      "type": "eventHub",
+      "direction": "out",
+      "name": "outputEventHubMessage",
+      "connection": "tweetstreameventhubsnamespace_RootManageSharedAccessKey_EVENTHUB",
+      "eventHubName": "tweet-stream-eh1"
     }
   ]
 }

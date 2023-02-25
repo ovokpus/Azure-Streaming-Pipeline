@@ -15,7 +15,7 @@ URL = f"{HURRICANE_API_URL}"
 # URL = "http://localhost:7071/api/HttpTrigger1"
 
 headers = {
-    'Host': 'tweet-stream-apim.azure-api.net',
+    'Host': 'tweet-stream-pipeline-apim.azure-api.net',
     'Authorization': AUTH_VALUE,
     'Ocp-Apim-Subscription-Key': OCP_APIM_SUBSCRIPTION_VALUE
 }
