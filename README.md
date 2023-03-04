@@ -62,7 +62,7 @@ The data is sources from 2 Kaggle projects:
 
 1. [Hurricane Harvey Tweets](https://www.kaggle.com/datasets/dan195/hurricaneharvey) Tweets containing hurricane harvey in the message from the morning of the tropical storm event (20th August 2017) up to when it became a Hurricane and then downgraded back to a tropical storm.
 
-2. [Satellite Images if Hurricane Damage](https://www.kaggle.com/datasets/kmader/satellite-images-of-hurricane-damage) Satellite images from Texas after the Hurricane. This dataset has been divided into 2 labels, for Machine learning purposes, to show photos that show damage and photos that do not show damage.
+2. [Satellite Images of Hurricane Damage](https://www.kaggle.com/datasets/kmader/satellite-images-of-hurricane-damage) Satellite images from Texas after the Hurricane. This dataset has been divided into 2 labels, for Machine learning purposes, to show photos that show damage and photos that do not show damage.
 
 Original Data is sources from [this location](https://ieee-dataport.org/open-access/detecting-damaged-buildings-post-hurricane-satellite-imagery-based-customized)
 
