@@ -8,7 +8,7 @@ Data Streaming Pipeline that sends tweets and images to an Azure CosmosDB via AP
 
 ---
 
-This project is a prototype of a Data Pipeline that emulates streaming data of twitter messages to a Microsoft Azure REST API endpoint. This streaming data is then stored in an Azure blob storage container, and pushed to an Azure Event Hubs Instance. Then the data is persisted in an Azure CosmosDB database, then consumed in Power BI.
+This project is a prototype of a Data Pipeline that emulates streaming data of twitter messages to a Microsoft Azure REST API endpoint. This streaming data is then stored in an Azure blob storage container, and pushed to an Azure Event Hubs Instance. Then the data is persisted in an Azure CosmosDB database, and finally consumed in Power BI.
 
 ## Pipeline Architecture
 
