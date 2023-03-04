@@ -1,3 +1,7 @@
+######################################################################################
+# This module generates streaming tweet data and pushes it to the REST API in Azure.
+######################################################################################
+
 import fire
 import os
 from dotenv import load_dotenv
