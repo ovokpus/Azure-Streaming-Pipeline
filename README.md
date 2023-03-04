@@ -12,9 +12,11 @@ This project is a prototype of a Data Pipeline that emulates streaming data of t
 
 ## Pipeline Architecture
 
+Here's a high-level overview of the end-to-end pipeline architecture
+
 ---
 
-![image](architecture)
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/pipeline-architecture.png)
 
 ---
 
