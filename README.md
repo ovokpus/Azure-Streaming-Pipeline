@@ -64,7 +64,7 @@ The data is sources from 2 Kaggle projects:
 
 2. [Satellite Images of Hurricane Damage](https://www.kaggle.com/datasets/kmader/satellite-images-of-hurricane-damage) Satellite images from Texas after the Hurricane. This dataset has been divided into 2 labels, for Machine learning purposes, to show photos that show damage and photos that do not show damage.
 
-Original Data is sources from [this location](https://ieee-dataport.org/open-access/detecting-damaged-buildings-post-hurricane-satellite-imagery-based-customized)
+Original Data is sourced from [this location](https://ieee-dataport.org/open-access/detecting-damaged-buildings-post-hurricane-satellite-imagery-based-customized)
 
 ---
 
