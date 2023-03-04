@@ -40,18 +40,18 @@ tweet_schema = {
         "year_month_date": {
             "type": "string"
         },
-        # "damage_flag": {
-        #     "type": "string"
-        # },
-        # "image_base64": {
-        #     "type": "string"
-        # },
-        # "latitude": {
-        #     "type": "number"
-        # },
-        # "longitude": {
-        #     "type": "number"
-        # }
+        "damage_flag": {
+            "type": "string"
+        },
+        "image_base64": {
+            "type": "string"
+        },
+        "latitude": {
+            "type": "number"
+        },
+        "longitude": {
+            "type": "number"
+        }
     },
     "required": [
         "tweet_id",
