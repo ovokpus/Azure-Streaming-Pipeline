@@ -27,7 +27,7 @@ This project is a prototype of a Data Pipeline that emulates streaming data of t
 5. Database: CosmosDB
 6. Consume: Power BI
 
-![image](resources)
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/azure-resource-group.png)
 
 ---
 
@@ -62,7 +62,7 @@ The data is sources from 2 Kaggle projects:
 
 2. [Satellite Images if Hurricane Damage](https://www.kaggle.com/datasets/kmader/satellite-images-of-hurricane-damage) Satellite images from Texas after the Hurricane. This dataset has been divided into 2 labels, for Machine learning purposes, to show photos that show damage and photos that do not show damage.
 
-Original Data is sources from [this location(https://ieee-dataport.org/open-access/detecting-damaged-buildings-post-hurricane-satellite-imagery-based-customized)]
+Original Data is sources from [this location](https://ieee-dataport.org/open-access/detecting-damaged-buildings-post-hurricane-satellite-imagery-based-customized)
 
 ---
 
@@ -94,9 +94,13 @@ The goal of this phase is to create a JSON file that contains tweet messages mer
 5. Test function in Azure, then implement function type authorization to secure your API.
 6. Bind function output to an Azure Blob Storage container. This can be done using the vscode extention functionalities that adds configuration to the `function.json` file.
 
-![image](testing API on Azure)
+Testing API with Insomnia
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/api-testing-insomnia.png)
 
-![image](Function APP)
+Function APP UI in Azure
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/azure-function-code-in-portal.png)
+
+---
 
 ### Set up Azure APIM instance and import function app into it
 
@@ -128,6 +132,44 @@ The goal of this phase is to create a JSON file that contains tweet messages mer
 
 In this step, we create a live connection in PowerBI to Azure CosmosDB, and watch the real time and interactive changes as streaming messages are generated from the python scripts, through the Azure functions, into Event Hubs, and finally into CosmosDB
 
-![image](dashboard)
+Power BI Dashboard report on Power BI Desktop
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/power-bi-report.png)
+
+---
 
 ## Metrics, Monitoring and other Images
+
+Blob Storage JSON view
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/blob-storage-json-view.png)
+
+---
+
+Event Hubs Instance
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/event-hub-monitoring.png)
+
+---
+
+Logging information from Function App
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/event-hub-trigger-logging.png)
+
+---
+
+Live metrics from Azure Function processing of streaming API calls
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/live-metrics.png)
+
+---
+
+Application Insights Monitoring Dashboard
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/tweet-stream-app-insights.png)
+
+---
+
+PowerBI Dashboard view in PowerBI service workspace
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/power-bi-dashboard.png)
+
+---
+
+PowerBI Lineage information showing data sourced from CosmosDB
+![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/power-bi-lineage-info.png)
+
+---
