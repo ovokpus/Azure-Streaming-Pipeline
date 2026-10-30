@@ -65,6 +65,26 @@ services:
       api:
         condition: service_healthy
 
+  # The real Azure Functions host running azure-func/function_app.py (Python v2 model).
+  functions:
+    build: ./azure-func
+    image: azure-streaming-pipeline/functions:local
+    platform: linux/amd64  # the Functions base image is published for amd64 only
+    environment:
+      FUNCTIONS_WORKER_RUNTIME: python
+      HTTP_AUTH_LEVEL: anonymous  # local only; Azure keeps function keys
+      AzureWebJobsStorage: &storage "DefaultEndpointsProtocol=http;AccountName=${AZURITE_ACCOUNT_NAME:-devstoreaccount1};AccountKey=${AZURITE_ACCOUNT_KEY:-Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==};BlobEndpoint=http://azurite:10000/${AZURITE_ACCOUNT_NAME:-devstoreaccount1};QueueEndpoint=http://azurite:10001/${AZURITE_ACCOUNT_NAME:-devstoreaccount1};TableEndpoint=http://azurite:10002/${AZURITE_ACCOUNT_NAME:-devstoreaccount1};"
+      STORAGE_CONNECTION: *storage
+      EVENTHUB_CONNECTION: "Endpoint=sb://eventhubs-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=${EVENTHUBS_SAS_KEY:-SAS_KEY_VALUE};UseDevelopmentEmulator=true;"
+      EVENTHUB_NAME: tweet-stream-eh1
+      EVENTHUB_FUNCTIONS_CONSUMER_GROUP: functions
+      COSMOS_CONNECTION: "AccountEndpoint=http://cosmos:8081/;AccountKey=${COSMOS_KEY:-C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==};"
+      COSMOS_DATABASE: hurricane
+      COSMOS_CONTAINER: tweets
+    ports: ["${FUNCTIONS_PORT:-7071}:80"]
+    depends_on: [azurite, eventhubs-emulator, cosmos]
+    restart: unless-stopped
+
   frontend:
     build: ./frontend
     ports: ["${FRONTEND_PORT:-3000}:80"]

@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "STORAGE_CONNECTION": "UseDevelopmentStorage=true",
+    "EVENTHUB_CONNECTION": "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=<EVENTHUBS_EMULATOR_SAS_KEY>;UseDevelopmentEmulator=true;",
+    "EVENTHUB_NAME": "tweet-stream-eh1",
+    "EVENTHUB_FUNCTIONS_CONSUMER_GROUP": "functions",
+    "COSMOS_CONNECTION": "AccountEndpoint=http://localhost:8081/;AccountKey=<COSMOS_EMULATOR_KEY>;",
+    "COSMOS_DATABASE": "hurricane",
+    "COSMOS_CONTAINER": "tweets"
+  }
+}
