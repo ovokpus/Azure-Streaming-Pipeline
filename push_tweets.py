@@ -15,14 +15,16 @@ HURRICANE_API_URL = os.getenv("HURRICANE_API_URL")
 AUTH_VALUE = os.getenv("AUTH_VALUE")
 OCP_APIM_SUBSCRIPTION_VALUE = os.getenv("OCP_APIM_SUBSCRIPTION_VALUE")
 
-URL = f"{HURRICANE_API_URL}"
-# URL = "http://localhost:7071/api/HttpTrigger1"
+# Defaults to the local stand-in API from docker compose; set HURRICANE_API_URL for APIM.
+URL = HURRICANE_API_URL or "http://localhost:8000/api/tweets"
 
-headers = {
-    'Host': 'tweet-stream-pipeline-apim.azure-api.net',
-    'Authorization': AUTH_VALUE,
-    'Ocp-Apim-Subscription-Key': OCP_APIM_SUBSCRIPTION_VALUE
-}
+headers = {}
+if HURRICANE_API_URL:
+    headers = {
+        'Host': 'tweet-stream-pipeline-apim.azure-api.net',
+        'Authorization': AUTH_VALUE,
+        'Ocp-Apim-Subscription-Key': OCP_APIM_SUBSCRIPTION_VALUE
+    }
 
 
 def send_tweets_to_rest_api(num_tweets):

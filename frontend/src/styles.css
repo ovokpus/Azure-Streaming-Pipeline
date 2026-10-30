@@ -1,0 +1,28 @@
+* { box-sizing: border-box }
+body { margin: 0; font-family: system-ui, sans-serif; background: #020617; color: #e2e8f0 }
+.page { max-width: 1280px; margin: 0 auto; padding: 20px }
+header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px }
+h1 { margin: 0; font-size: 24px } .sub { color: #94a3b8; font-weight: 400; font-size: 16px }
+h2 { font-size: 14px; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; margin: 14px 0 8px }
+.badges span { margin-left: 6px; padding: 3px 9px; border-radius: 99px; font-size: 12px }
+.ok { background: #14532d; color: #bbf7d0 } .bad { background: #7f1d1d; color: #fecaca }
+.note { color: #94a3b8; font-size: 13px }
+.stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 12px 0 }
+.card, .panel { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 12px }
+.num { font-size: 28px; font-weight: 700; color: #38bdf8 }
+.hint { font-size: 11px; color: #64748b; margin-top: 4px }
+.grid { display: grid; grid-template-columns: 400px 1fr; gap: 12px; margin-bottom: 12px }
+.bar { display: flex; height: 26px; border-radius: 6px; overflow: hidden; font-size: 12px }
+.bar div { display: flex; align-items: center; padding: 0 8px; white-space: nowrap; min-width: 0 }
+.dmg { background: #7f1d1d; color: #fecaca } .nodmg { background: #14532d; color: #bbf7d0 }
+.axis { fill: #64748b; font-size: 10px }
+button { background: #0284c7; color: white; border: 0; border-radius: 6px; padding: 8px 12px; margin-right: 8px; cursor: pointer }
+button.secondary { background: #475569 }
+.notice { font-size: 12px; word-break: break-all }
+.feed { list-style: none; margin: 0; padding: 0; max-height: 640px; overflow: auto }
+.feed li { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1e293b; font-size: 14px }
+.feed img, .noimg { width: 40px; height: 40px; border-radius: 4px; image-rendering: pixelated; flex: none; background: #1e293b; display: flex; align-items: center; justify-content: center }
+.meta { font-size: 12px; color: #94a3b8 }
+.tag { padding: 0 6px; border-radius: 4px }
+table { width: 100%; border-collapse: collapse; font-size: 13px }
+th, td { text-align: left; padding: 6px; border-bottom: 1px solid #1e293b }

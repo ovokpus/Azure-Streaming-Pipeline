@@ -1,0 +1,21 @@
+{
+  "UserConfig": {
+    "NamespaceConfig": [
+      {
+        "Type": "EventHub",
+        "Name": "emulatorNs1",
+        "Entities": [
+          {
+            "Name": "tweet-stream-eh1",
+            "PartitionCount": "2",
+            "ConsumerGroups": [
+              { "Name": "cosmos-writer" },
+              { "Name": "live-view" }
+            ]
+          }
+        ]
+      }
+    ],
+    "LoggingConfig": { "Type": "File" }
+  }
+}

@@ -1,0 +1,7 @@
+.git
+.venv
+**/__pycache__
+frontend
+legacy
+docs
+img
