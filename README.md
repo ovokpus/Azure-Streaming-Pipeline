@@ -1,177 +1,157 @@
-# Azure-Streaming-Pipeline
+# 🌀 Azure Streaming Pipeline: Hurricane Harvey Tweets
 
-Data Streaming Pipeline that sends tweets and images to an Azure CosmosDB via APIM and Azure Functions, with visualization in PowerBI
+> A serverless Azure pipeline that ingests disaster tweets (text + images) over a REST API, lands the raw messages in Blob Storage, streams them through Event Hubs, and persists them in Cosmos DB for analytics. **It now runs entirely on your laptop with `docker compose up`, using Microsoft's own emulators.**
 
----
-
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/twitter-azure.jpeg)
+![Live view](docs/screenshots/live-view.png)
 
 ---
 
-This project is a prototype of a Data Pipeline that emulates streaming data of twitter messages to a Microsoft Azure REST API endpoint. This streaming data is then stored in an Azure blob storage container, and pushed to an Azure Event Hubs Instance. Then the data is persisted in an Azure CosmosDB database, and finally consumed in Power BI.
+## 1. The problem
 
-## Pipeline Architecture
+During Hurricane Harvey (Aug 2017) people posted thousands of tweets and photos about flooding and damage. Responders need them **as they happen**: validated, stored, and queryable, with damage signals surfaced quickly.
 
-Here's a high-level overview of the end-to-end pipeline architecture
+## 2. Architecture in Azure (original design)
 
----
+```mermaid
+flowchart LR
+    P[push_tweets.py<br/>producer] -->|HTTPS + subscription key| APIM[API Management]
+    APIM --> F1[Function<br/>TriggerTweetsToBlobAndEventHub<br/>JSON Schema validation]
+    F1 -->|raw JSON| B[(Blob Storage<br/>tweets/)]
+    F1 -->|event| EH{{Event Hubs<br/>tweet-stream-eh1}}
+    EH --> F2[Function<br/>EventHubTriggerTweetsToCosmosDB]
+    F2 --> C[(Cosmos DB<br/>hurricane / tweets)]
+    C --> BI[Power BI]
+```
 
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/pipeline-architecture.png)
+The functions are still in [`azure-func/`](azure-func) and can be deployed as before. The original write-up (Kaggle preprocessing, Azure portal screenshots) is preserved in [docs/ORIGINAL_README.md](docs/ORIGINAL_README.md).
 
----
+## 3. The same pipeline, locally
 
-## Azure Resources Utilized
+Every Azure service has a local stand-in. The Azure SDKs are the real ones; only the connection strings change.
 
-1. Connect: API Management
-2. Process: Azure Functions
-3. Buffer: Event Hub
-4. Store and Serve: Blob Storage
-5. Database: CosmosDB
-6. Consume: Power BI
+| Azure service | Local stand-in | Port(s) |
+|---|---|---|
+| API Management + HTTP Function | `api` (FastAPI), using the **same** schema code as the function (`azure-func/shared_code`) | 8000 |
+| Blob Storage | [Azurite](https://learn.microsoft.com/azure/storage/common/storage-use-azurite) | 10000-10002 |
+| Event Hubs | [Event Hubs emulator](https://learn.microsoft.com/azure/event-hubs/overview-emulator) (config in [`emulators/eventhubs-config.json`](emulators/eventhubs-config.json)) | 5672 AMQP, 9092 Kafka |
+| Event Hub → Cosmos Function | `worker`: Event Hub consumer (`cosmos-writer` group, checkpoints in Azurite) that upserts into Cosmos | – |
+| Cosmos DB (NoSQL) | [Cosmos DB Linux emulator (vNext)](https://learn.microsoft.com/azure/cosmos-db/emulator-linux), works on arm64 and x64 | 8081, Data Explorer 1234 |
+| Power BI | `frontend`: React live view (Vite + TypeScript, served by nginx) | 3000 |
+| push_tweets.py | `producer`: replays the stream at 2 tweets/s, with every 25th tweet deliberately invalid | – |
 
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/azure-resource-group.png)
+```mermaid
+flowchart LR
+    PR[producer] -->|POST /api/tweets| API[api · FastAPI]
+    UI[React live view :3000] -->|test tweets| API
+    API -->|blob| AZ[(Azurite)]
+    API -->|send| EH{{Event Hubs emulator}}
+    EH -->|cosmos-writer| W[worker]
+    W -->|upsert| CO[(Cosmos emulator)]
+    W -. checkpoints .-> AZ
+    EH -->|live-view| API
+    API -->|SSE /api/live| UI
+    API -->|/api/stats, /api/tweets| UI
+    EH -. metadata .-> AZ
+```
 
----
+### Message lifecycle
 
-### Azure Functions
+```mermaid
+sequenceDiagram
+    participant P as producer
+    participant A as api
+    participant B as Azurite
+    participant E as Event Hub
+    participant W as worker
+    participant C as Cosmos
+    participant U as live view
+    P->>A: POST tweet JSON
+    alt schema invalid
+        A-->>P: 400 + reason
+    else valid
+        A->>B: upload tweets/{uuid}.json
+        A->>E: send event
+        A-->>P: 200
+        E->>W: batch (cosmos-writer)
+        W->>C: upsert {id: tweet_id, ...}
+        E->>A: event (live-view)
+        A-->>U: SSE push
+    end
+```
 
-Azure Functions is an event-driven, compute-on-demand serverless offering that hosts a single method or function in a programming language that runs in response to an event. The programming language used here is python. We have two Azure functions in this pipeline. One of them is triggered by an API POST request, and the other is triggered by a push into Event Hubs.
+## 4. Run it
 
-### Azure API Management (APIM)
+```bash
+cp .env.example .env    # optional: defaults already target the emulators
+docker compose up --build
+```
 
-Azure API Management is a fully managed service that helps customers to securely expose their APIs to external and internal customers. It serves as a gatekeeper and front door for API implementations, enabling frictionless consumption by developers. APIM comes with features like:
+| URL | What |
+|---|---|
+| http://localhost:3000 | Live view |
+| http://localhost:8000/docs | API (OpenAPI) |
+| http://localhost:1234 | Cosmos DB Data Explorer |
 
-1. Securing your API, including setting quotas and request throttling
-2. A developer portal for users of your API, which included documentation ansd security key management.
-3. Self-service subscription for API users
-4. Monitor usage of your API
+The first start takes about 30-60 s while the emulators boot. The api waits until all three are ready (`/health` reports each one), then the producer starts. Stop everything with `docker compose down`.
 
-### Event Hubs
+> **Event Hubs emulator license.** Running the emulator requires accepting Microsoft's [emulator license terms](https://github.com/Azure/azure-event-hubs-emulator-installer/blob/main/EMULATOR_EULA.txt). `docker-compose.yml` passes `ACCEPT_EULA=Y` by default through `EVENTHUBS_EMULATOR_ACCEPT_EULA`.
 
-Event Hubs represents the front door for an event pipeline. It is often used as an event ingestor in Solution Architecture. An event ingestor is a component or service that sits between event publishers and event consumers to decouple the production of an event stream from the consumption of these events. Event Hubs provides a unified streaming platform with time retention buffer, decoupling event producers from event consumers
+> **About the credentials in `stream/config.py`.** These are the *publicly documented* emulator defaults (Azurite `devstoreaccount1`, Event Hubs `SAS_KEY_VALUE`, the Cosmos emulator key). They are not secrets. To target real Azure, set the variables listed in `.env.example` in a `.env` that you never commit.
 
-### Azure CosmosDB Core (NoSQL) API
+## 5. What you see
 
-CosmosDB is a fully managed NoSQL database for mordern application development. It has several API options, depending on particular use cases, such as key-value, wide-column, graph and document databases. For new projects, Microsoft Azure recommends the use of the core (NoSQL) API.
+**Live view.** It shows a counter for each pipeline stage, a throughput sparkline, the damage split, a map of where tweets came from, the live Event Hub feed (with image tiles), and the newest Cosmos documents:
 
----
+![Live view](docs/screenshots/live-view.png)
 
-## The Data Source
+**Schema enforcement.** The *Send invalid tweet* button posts a tweet with no latitude. The api returns HTTP 400 with the same message the Azure Function produces:
 
-The data is sources from 2 Kaggle projects:
+![Rejection](docs/screenshots/live-view-rejection.png)
 
-1. [Hurricane Harvey Tweets](https://www.kaggle.com/datasets/dan195/hurricaneharvey) Tweets containing hurricane harvey in the message from the morning of the tropical storm event (20th August 2017) up to when it became a Hurricane and then downgraded back to a tropical storm.
+**Cosmos DB emulator.** The Data Explorer shows the `hurricane` database the worker created:
 
-2. [Satellite Images of Hurricane Damage](https://www.kaggle.com/datasets/kmader/satellite-images-of-hurricane-damage) Satellite images from Texas after the Hurricane. This dataset has been divided into 2 labels, for Machine learning purposes, to show photos that show damage and photos that do not show damage.
+![Cosmos Data Explorer](docs/screenshots/cosmos-data-explorer.png)
 
-Original Data is sourced from [this location](https://ieee-dataport.org/open-access/detecting-damaged-buildings-post-hurricane-satellite-imagery-based-customized)
+**API:**
 
----
+![API docs](docs/screenshots/api-docs.png)
 
-## Project Prerequisites
+Screenshots are real, captured headless from the running stack with `uv run --with playwright python scripts/screenshots.py`.
 
-1. WSL2 `(Ubuntu 22.04)` environment for Windows users
-2. VSCode with Microsoft Azure and Remote containers extensions
-3. Python
-4. A Microsoft Azure Account with minimal spending
-5. Docker and Docker-Compose
+## 6. Data: synthetic by default
 
-## Project Pipeline implementation steps/phases
+The original Kaggle datasets (Harvey tweets plus satellite damage images) need a Kaggle login and are not redistributable, so they are not in the repo. Locally, `stream/sample.py` generates a **deterministic synthetic stream** of 500 tweets in the same shape: templated Harvey-style text, coordinates around the Texas Gulf coast, a `damage_flag`, and a small generated PNG tile on about 60% of tweets. **None of it is real tweet or image data.**
 
-### Preprocessing
+To replay the real stream, run the original preprocessing (`preprocessing/scripts`, see [docs/ORIGINAL_README.md](docs/ORIGINAL_README.md)) and point the producer at the output:
 
-The goal of this phase is to create a JSON file that contains tweet messages merged with images, with the images first encoded into base64 format. Then these merged tweet and image messages are sent as a request body to the REST API in Azure APIM. Python scripts have been prepared to perforom the following tasks, which can indeed be orchestrated in a regular schedule to procuce both batch or streaming data, depending on the use case of the prototype.
+```bash
+SAMPLE_PATH=/data/merged_tweets_image_metadata_stream.json  # mount it into the producer container
+```
 
-1. Preprocess the tweets, and convert them to JSON format
-2. Preprocess the images and convert them to JSON format
-3. Merge image and messages into single JSON schema
-4. Push merged tweets to API to simulate streaming data
+## 7. Fixes made along the way
 
-### Azure Function Development
+- **The Event Hub → Cosmos function lost data.** It called `outputDocument.set()` once per event, so each batch kept only its last tweet. It now writes the whole batch as a `DocumentList`.
+- **Shared validation.** The HTTP function's schema check (400 on bad JSON or schema failure) moved into `shared_code/`, so the local api enforces exactly the same contract. A stray `ValueError` used to fall through and return nothing; it now returns a 400 too.
+- Cosmos documents get `id = str(tweet_id)`, so retries upsert instead of duplicating.
+- `push_tweets.py` defaults to the local api when `HURRICANE_API_URL` is unset.
 
-1. Developing Azure Function in Python using VSCode extension, which includes Azure Functions SDK, Docker CLI, and related dependencies. The code ingests body of HTTP request, and validates JSON message against a predefined JSON schema.
-2. Test function in Azure Function App from local project workspace.
-3. Test function with the dataset preprocessed.
-4. Deploy Azure Function App from your local project workspace.
-5. Test function in Azure, then implement function type authorization to secure your API.
-6. Bind function output to an Azure Blob Storage container. This can be done using the vscode extention functionalities that adds configuration to the `function.json` file.
+## 8. Project layout
 
-Testing API with Insomnia
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/api-testing-insomnia.png)
+```
+azure-func/            Azure Functions (deployable) + shared_code/ schema
+stream/                local stand-ins: api, worker, producer, sample data, config
+frontend/              React live view (Vite + TS, nginx)
+emulators/             Event Hubs emulator config
+tests/                 pytest: schema, sample, function bindings, api
+preprocessing/         original Kaggle preprocessing scripts
+legacy/                moved, not deleted: HttpTrigger1 template, old requirements.txt
+docs/                  original README, screenshots
+```
 
-Function APP UI in Azure
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/azure-function-code-in-portal.png)
+## 9. Tests and CI
 
----
+```bash
+uv sync && uv run pytest -q   # 12 tests, no emulators needed
+```
 
-### Set up Azure APIM instance and import function app into it
-
-1. Create a new Azure API Management instance
-2. Add API to APIM to expose and protect the Azure Function as a backend
-3. Test it from within the APIM and locally from Insomnia
-4. Add a basic authentication policy to a default subscription key to secure the API. This is done by:
-   a. creating a key vault,
-   b. enabling acess to key vault secrets,
-   c. adding a username and password,
-   d. creating names values in APIM with key vault url,
-   e. adding an inbound policy definition
-   f. Testing request with basic authorization header
-5. Test it out from your API and Imported function app as well as from your python program, `push_tweets.py`
-
-### Set Up Azure Event Hubs namespace
-
-1. Create an Event Hubs namespace - standard tier
-2. Create an Event Hub with 2 partitions and a 1-day message retention
-3. Capture events using first Azure function and Azure Event Hubs Capture
-4. Include an Azure Event Hubs binding in the Azure Function.
-
-### Create CosmosDB Instance and create second Azure Function to pull tweets from Event Hubs into CosmosDB
-
-1. Create a database with one container
-2. Create Azure function to take tweets from Event Hub Instance and write it to CosmosDB
-
-### Consumption layer - Power BI Dashboard
-
-In this step, we create a live connection in PowerBI to Azure CosmosDB, and watch the real time and interactive changes as streaming messages are generated from the python scripts, through the Azure functions, into Event Hubs, and finally into CosmosDB
-
-Power BI Dashboard report on Power BI Desktop
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/power-bi-report.png)
-
----
-
-## Metrics, Monitoring and other Images
-
-Blob Storage JSON view
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/blob-storage-json-view.png)
-
----
-
-Event Hubs Instance
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/event-hub-monitoring.png)
-
----
-
-Logging information from Function App
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/event-hub-trigger-logging.png)
-
----
-
-Live metrics from Azure Function processing of streaming API calls
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/live-metrics.png)
-
----
-
-Application Insights Monitoring Dashboard
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/tweet-stream-app-insights.png)
-
----
-
-PowerBI Dashboard view in PowerBI service workspace
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/power-bi-dashboard.png)
-
----
-
-PowerBI Lineage information showing data sourced from CosmosDB
-![image](https://github.com/ovokpus/Azure-Streaming-Pipeline/blob/main/img/power-bi-lineage-info.png)
-
----
+GitHub Actions runs the unit tests and the frontend type-check and build, then `docker compose build`.

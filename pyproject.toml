@@ -1,0 +1,25 @@
+[project]
+name = "azure-streaming-pipeline-local"
+version = "1.0.0"
+description = "Hurricane tweet stream on local Azure emulators (Azurite, Event Hubs, Cosmos DB)"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "httpx>=0.27",
+    "jsonschema>=4.23",
+    "azure-eventhub>=5.12",
+    "azure-eventhub-checkpointstoreblob>=1.1",
+    "azure-storage-blob>=12.20",
+    "azure-cosmos>=4.7",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "azure-functions>=1.20"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "azure-func"]

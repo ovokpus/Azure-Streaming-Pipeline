@@ -131,3 +131,8 @@ dmypy.json
 
 **/data/
 local.settings.json
+# local app
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+.DS_Store
