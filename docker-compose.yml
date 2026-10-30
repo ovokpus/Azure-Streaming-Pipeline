@@ -11,6 +11,12 @@ x-app: &app
   env_file:
     - path: .env
       required: false
+  environment:
+    # Local emulator credentials only. Override in .env; never put real Azure keys in this file.
+    AZURITE_ACCOUNT_NAME: ${AZURITE_ACCOUNT_NAME:-devstoreaccount1}
+    AZURITE_ACCOUNT_KEY: ${AZURITE_ACCOUNT_KEY:-Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==}  # publicly documented Azurite dev key (the Event Hubs emulator also uses it)
+    EVENTHUBS_SAS_KEY: ${EVENTHUBS_SAS_KEY:-SAS_KEY_VALUE}
+    COSMOS_KEY: ${COSMOS_KEY:-C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==}  # fixed, publicly documented Cosmos emulator key
   restart: unless-stopped
 
 services:
