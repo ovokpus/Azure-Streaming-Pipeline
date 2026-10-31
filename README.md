@@ -1,5 +1,7 @@
 # 🌀 Azure Streaming Pipeline: Hurricane Harvey Tweets
 
+<p align="center"><img src="assets/banner.jpg" alt="Row of glass funnels dripping glowing water into jars on a rack under cyan light" width="100%"></p>
+
 <p align="center"><img src="docs/assets/hero.svg" alt="Azure Streaming Pipeline" width="100%"/></p>
 
 > A serverless Azure pipeline that ingests disaster tweets (text + images) over a REST API, lands the raw messages in Blob Storage, streams them through Event Hubs, and persists them in Cosmos DB for analytics. **It now runs entirely on your laptop with `docker compose up`, using Microsoft's own emulators.**
