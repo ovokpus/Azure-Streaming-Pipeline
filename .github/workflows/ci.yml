@@ -37,3 +37,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker compose build
+
+  functions-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Boot the Functions host (v2 app) on Azurite + Event Hubs emulator
+        run: docker compose up -d --build --no-deps azurite eventhubs-emulator functions
+      - name: v2 HTTP function is indexed and validates input
+        run: |
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /tmp/out -w '%{http_code}' -X POST \
+              http://localhost:7071/api/TriggerTweetsToBlobAndEventHub -d '{"tweet_id": 1}' || true)
+            [ "$code" = "400" ] && break; sleep 3
+          done
+          cat /tmp/out; echo; test "$code" = "400"
+          grep -q "JSON Schema is not valid" /tmp/out
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs functions
+      - run: docker compose down
+        if: always()

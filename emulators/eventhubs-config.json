@@ -9,13 +9,22 @@
             "Name": "tweet-stream-eh1",
             "PartitionCount": "2",
             "ConsumerGroups": [
-              { "Name": "cosmos-writer" },
-              { "Name": "live-view" }
+              {
+                "Name": "cosmos-writer"
+              },
+              {
+                "Name": "live-view"
+              },
+              {
+                "Name": "functions"
+              }
             ]
           }
         ]
       }
     ],
-    "LoggingConfig": { "Type": "File" }
+    "LoggingConfig": {
+      "Type": "File"
+    }
   }
 }
