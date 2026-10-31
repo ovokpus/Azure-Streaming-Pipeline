@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner.jpg" alt="Row of glass funnels dripping glowing water into jars on a rack under cyan light" width="100%"></p>
+
 # 🌀 Azure Streaming Pipeline: Hurricane Harvey Tweets
 
 <p align="center"><img src="docs/assets/hero.svg" alt="Azure Streaming Pipeline" width="100%"/></p>
