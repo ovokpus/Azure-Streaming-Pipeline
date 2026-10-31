@@ -8,6 +8,10 @@
 
 ---
 
+## Business case
+
+During a disaster, responders need incoming posts and photos validated, stored and searchable while they still matter. This serverless Azure pipeline validates each post, keeps the raw copy in Blob Storage, streams it through Event Hubs and stores it in Cosmos DB, and the whole thing runs locally on emulators. The hard part in real use is a licensed data feed, not the pipeline. [docs/BUSINESS_CASE.md](docs/BUSINESS_CASE.md) covers the buyers, use cases, an illustrative ROI model and the limits.
+
 ## 1. The problem
 
 During Hurricane Harvey (Aug 2017) people posted thousands of tweets and photos about flooding and damage. Responders need them **as they happen**: validated, stored, and queryable, with damage signals surfaced quickly.
